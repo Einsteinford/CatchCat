@@ -18,7 +18,6 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         this.requestWindowFeature(Window.FEATURE_NO_TITLE);      //隐藏标题栏,需要继承自Activity
         setContentView(R.layout.activity_main);     //设定所关联的xml文件
-//        setContentView(new Playground(this));
 
 
         Intent gauntest = getIntent();      //利用getIntent()方法实例化其它Activity所传过来的Intent
