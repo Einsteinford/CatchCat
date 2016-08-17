@@ -5,6 +5,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.RectF;
+import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -14,9 +15,6 @@ import android.widget.Toast;
 import java.util.HashMap;
 import java.util.Vector;
 
-/**
- * Created by KK on 2016-07-14.
- */
 public class Playground extends SurfaceView implements View.OnTouchListener {
 
 
@@ -30,8 +28,8 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
     private Dot matrix[][];     //声明由点组成的二元数组
     private Dot cat;            //声明猫
 
-    public Playground(Context context) {        //类构造方法
-        super(context);
+    public Playground(Context context,AttributeSet attrs) {        //类构造方法
+        super(context,attrs);
         getHolder().addCallback(callback);
         matrix = new Dot[ROW][COL];     //创建矩阵点
         for (int i = 0; i < ROW; i++) {
@@ -96,9 +94,9 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
         if (isAtEdge(one)) {
             return 1;
         }
-        Dot origen = one, next;
+        Dot origin = one, next;
         while (true) {
-            next = getNeighbour(origen, dir);
+            next = getNeighbour(origin, dir);
             if (next.getStatus() == Dot.STATUS_ON) {
                 return distance * -1;
             }
@@ -107,7 +105,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
                 return distance;
             }
             distance++;
-            origen = next;
+            origin = next;
         }
     }
 
@@ -122,23 +120,23 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
             lose();
             return;
         }
-        Vector<Dot> avaliable = new Vector<>();
+        Vector<Dot> available = new Vector<>();
         Vector<Dot> positive = new Vector<>();
         HashMap<Dot, Integer> al = new HashMap<Dot,Integer>();
         for (int i = 1; i < 7; i++) {
             Dot n = getNeighbour(cat, i);
             if (n.getStatus() == Dot.STATUS_OFF) {
-                avaliable.add(n);
+                available.add(n);
                 al.put(n, i);
                 if (getDistance(n, i) > 0) {
                     positive.add(n);
                 }
             }
         }
-        if (avaliable.size() == 0) {
+        if (available.size() == 0) {
             win();
-        } else if (avaliable.size() == 1) {
-            MoveTo(avaliable.get(0));
+        } else if (available.size() == 1) {
+            MoveTo(available.get(0));
         } else {
             Dot best = null;
             if (positive.size() != 0) {     //存在可以直接到达屏幕边缘的走向
@@ -155,11 +153,11 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
             } else {    //所有方向都存在路障
                 System.out.println("躲路障");
                 int max = 0;
-                for (int i = 0; i < avaliable.size(); i++) {
-                    int k = getDistance(avaliable.get(i), al.get(avaliable.get(i)));
+                for (int i = 0; i < available.size(); i++) {
+                    int k = getDistance(available.get(i), al.get(available.get(i)));
                     if (k <= max) {
                         max = k;
-                        best = avaliable.get(i);
+                        best = available.get(i);
                     }
                 }
                 MoveTo(best);
@@ -175,10 +173,10 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
         Toast.makeText(getContext(), "You Win", Toast.LENGTH_SHORT).show();
     }
 
-    private void redraw() {      //重新绘制圆圈并上色
-        Canvas c = getHolder().lockCanvas();
-        c.drawColor(Color.DKGRAY);
-        Paint paint = new Paint();      //实例化Paint类
+    public void redraw() {      //重新绘制圆圈并上色
+        Canvas c = getHolder().lockCanvas();        //锁定画图
+        c.drawColor(Color.DKGRAY);      //设置画布背景颜色
+        Paint paint = new Paint();      //创建画笔
         paint.setFlags(Paint.ANTI_ALIAS_FLAG);  //打开抗锯齿
         for (int i = 0; i < ROW; i++) {       //绘制时，将单双行错开
             float offset = 0;     //单数行无偏移量
@@ -207,13 +205,14 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
                 //绘制每一个圆圈,带色彩的，此处就是实际坐标效果了
             }
         }
-        getHolder().unlockCanvasAndPost(c);
+
+        getHolder().unlockCanvasAndPost(c);     //结束锁定画图，并提交改变。
     }
 
     SurfaceHolder.Callback callback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
-//            redraw();
+            redraw();
         }
 
         @Override
@@ -228,7 +227,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
         }
     };
 
-    private void initGame() {        //初始化游戏点阵
+    public void initGame() {        //初始化游戏点阵
         for (int i = 0; i < ROW; i++) {
             for (int j = 0; j < COL; j++) {
                 matrix[i][j].setStatus(Dot.STATUS_OFF);     //每一个点都默认设置为空闲
@@ -258,7 +257,7 @@ public class Playground extends SurfaceView implements View.OnTouchListener {
                 x = (motionEvent.getX() / WIDTH - interval - 0.5f); //x减去页边距，并减去offset量
             }
             if ((int) x + 1 > COL || (int) y + 1 > ROW || x < 0 || y < 0) {     //如果点击范围超出游戏主窗口
-                initGame();     //则重置游戏
+//                initGame();     //则重置游戏
             } else if (getDot((int) x, (int) y).getStatus() == Dot.STATUS_OFF) {        //点击的坐标点如果是空闲的
                 getDot((int) x, (int) y).setStatus(Dot.STATUS_ON);      //则将此坐标点状态变更为路障
                 move();     //cat进行move动作

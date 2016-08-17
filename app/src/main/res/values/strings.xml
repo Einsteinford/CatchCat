@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">CatchCat</string>
+    <string name="starWord">Hello\n 米斯兰达！</string>
+    <string name="explain">这个游戏的玩法非常的简单，就是将图中的红点围住，不让它从旁边跑掉</string>
+    <string name="refresh">刷新游戏</string>
+
 </resources>

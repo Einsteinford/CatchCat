@@ -1,8 +1,5 @@
 package comeinsteinford.github.catchcat;
 
-/**
- * Created by KK on 2016-07-14.
- */
 public class Dot {      //用于记录每一个点的状态
 
     int x,y;    //声明每一个点的坐标
